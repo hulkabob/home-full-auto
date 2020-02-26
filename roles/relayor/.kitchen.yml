@@ -1,0 +1,89 @@
+---
+driver:
+  name: vagrant
+  customize:
+    memory: 512
+
+platforms:
+  - name: debian-10
+  - name: ubuntu-18.04
+#  - name: centos-7
+#  - name: fedora-29
+#    driver:
+#      box: roboxes/fedora29
+  - name: freebsd-12
+    driver:
+      provision: True
+      vagrantfiles:
+        - test/vagrant_provisions/freebsd_vagrant_provision.rb
+  - name: openbsd
+    driver:
+      box: roboxes/openbsd6
+      provision: True
+      vagrantfiles:
+        - test/vagrant_provisions/openbsd_vagrant_provision.rb
+
+provisioner:
+  name: ansible_push
+  chef_bootstrap_url: nil
+  idempotency_test: true
+  fail_non_idempotent: true
+  diff: true
+
+transport:
+  max_ssh_sessions: 6
+
+suites:
+  - name: t-guard
+    provisioner:
+      playbook: "test/integration/default/guard-node.yml"
+  - name: t-exit
+    provisioner:
+      playbook: "test/integration/default/exit-node.yml"
+  - name: t-guard-alpha
+    provisioner:
+      playbook: "test/integration/default/guard-alpha-node.yml"
+# test for the tor_ExitRelaySetting_file feature to run
+# exit and non-exit tor instances on a single machine
+  - name: t-mixed
+    provisioner:
+      playbook: "test/integration/default/mixed-node.yml"
+  - name: t-exit-per-instance-exitpolicy
+    provisioner:
+      playbook: "test/integration/default/exit-per-instance-exitpolicy.yml"
+  - name: t-guard-2publicIPs
+    driver:
+      network:
+      - ["private_network", {ip: "192.0.2.10"}]
+      - ["private_network", {ip: "198.51.100.10"}]
+    provisioner:
+      playbook: "test/integration/default/2publicIPs-guard-node.yml"
+  - name: t-exit-2publicIPs
+    driver:
+      network:
+      - ["private_network", {ip: "192.0.2.10"}]
+      - ["private_network", {ip: "198.51.100.10"}]
+    provisioner:
+      playbook: "test/integration/default/2publicIPs-exit-node.yml"
+  - name: t-exit-6publicIPs-dedicatedExitIP-2instPerIP
+    driver:
+      network:
+      - ["private_network", {ip: "192.0.2.10"}]
+      - ["private_network", {ip: "198.51.100.10"}]
+      - ["private_network", {ip: "198.51.100.11"}]
+      - ["private_network", {ip: "198.51.100.12"}]
+      - ["private_network", {ip: "198.51.100.13"}]
+      - ["private_network", {ip: "198.51.100.14"}]
+    provisioner:
+      playbook: "test/integration/default/6publicIPs-dedicatedExitIP-2instPerIP-exit-node.yml"
+  - name: t-exit-6publicIPs-dedicatedExitIP-singleInstPerIP
+    driver:
+      network:
+      - ["private_network", {ip: "192.0.2.10"}]
+      - ["private_network", {ip: "198.51.100.10"}]
+      - ["private_network", {ip: "198.51.100.11"}]
+      - ["private_network", {ip: "198.51.100.12"}]
+      - ["private_network", {ip: "198.51.100.13"}]
+      - ["private_network", {ip: "198.51.100.14"}]
+    provisioner:
+      playbook: "test/integration/default/6publicIPs-dedicatedExitIP-singleInstPerIP-exit-node.yml"

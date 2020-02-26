@@ -1,0 +1,44 @@
+---
+
+- name: Choose tor alpha version package (FreeBSD)
+  set_fact:
+    tor_packages: tor-devel
+  when: tor_alpha
+
+- name: Ensure sequential IP IDs are avoided (FreeBSD)
+  become: yes
+  sysctl:
+    name: net.inet.ip.random_id
+    value: 1
+    reload: no
+    sysctl_set: yes
+
+- name: Gather current kern.ipc.somaxconn setting (FreeBSD)
+  command: "sysctl -n kern.ipc.somaxconn"
+  become: no
+  register: tor_currentsomaxconn
+  changed_when: False
+
+- name: Ensure somaxconn setting is reasonable (FreeBSD)
+  become: yes
+  sysctl:
+    name: kern.ipc.somaxconn
+    value: "{{ tor_freebsd_somaxconn }}"
+    reload: no
+    sysctl_set: yes
+  when: tor_currentsomaxconn.stdout|int < tor_freebsd_somaxconn
+
+- name: Gather current kern.ipc.nmbclusters setting (FreeBSD)
+  become: no
+  command: "sysctl -n kern.ipc.nmbclusters"
+  register: tor_currentnmbc
+  changed_when: False
+
+- name: Ensure nmbclusters setting is reasonable (FreeBSD)
+  become: yes
+  sysctl:
+    name: kern.ipc.nmbclusters
+    value: "{{ tor_freebsd_nmbclusters }}"
+    reload: no
+    sysctl_set: yes
+  when: tor_currentnmbc.stdout|int < tor_freebsd_nmbclusters

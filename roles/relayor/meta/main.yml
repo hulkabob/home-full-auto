@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  author: nusenu
+  description: An Ansible role for Tor Relay Operators
+  license: GPLv3
+  platforms:
+  - name: Debian
+    versions:
+    - stretch
+    - buster
+  - name: FreeBSD
+    versions:
+    - 11.3
+    - 12.1
+  - name: OpenBSD
+    versions:
+    - 6.6
+  - name: Ubuntu
+    versions:
+    - bionic
+  galaxy_tags:
+    - tor
+    - ipv6
+    - anonymity
+    - networking
+  min_ansible_version: 2.9.1
+dependencies: []

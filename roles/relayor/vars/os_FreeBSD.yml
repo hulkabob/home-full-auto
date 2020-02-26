@@ -1,0 +1,4 @@
+---
+
+tor_DataDir: /var/db/tor-instances
+tor_ConfDir: /usr/local/etc/tor/enabled

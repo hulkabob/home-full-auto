@@ -1,0 +1,14 @@
+---
+
+# Linux/systemd section (uses service module)
+# ===========================================
+
+- name: Ensure Tor instances are enabled and started (Linux/systemd)
+  become: yes
+  service:
+    name: "tor@{{ item.0.ipv4 }}_{{ item.1.orport }}.service"
+    enabled: yes
+    state: started
+  with_nested:
+   - "{{ tor_ips }}"
+   - "{{ tor_ports }}"

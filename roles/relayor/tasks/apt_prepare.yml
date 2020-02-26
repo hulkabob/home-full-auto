@@ -1,0 +1,67 @@
+---
+
+- name: Ensure lsb-release and apt-transport-https packages are installed
+  become: yes
+  apt:
+    name: lsb-release,apt-transport-https
+  notify:
+    - re-gather facts
+
+- meta: flush_handlers
+
+- name: Ensure torproject gpg key is installed (A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89)
+  become: yes
+  apt_key:
+    data: "{{ lookup('file', 'deb.torproject.org_A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.pub') }}"
+    id: A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+    state: present
+
+- name: Ensure torproject.org repository is present (APT)
+  become: yes
+  apt_repository:
+    repo: 'deb https://deb.torproject.org/torproject.org {{ tor_distribution_release }} main'
+    state: present
+    update_cache: yes
+
+- name: Override tor_alpha_version if nightly builds repo is enabled (APT)
+  set_fact:
+    tor_alpha_version: nightly-master
+    tor_alpha: True
+  when: tor_nightly_builds
+
+- name: Ensure torproject.org alpha/nightly repo is present if enabled (APT)
+  become: yes
+  apt_repository:
+    repo: 'deb https://deb.torproject.org/torproject.org tor-{{ tor_alpha_version }}-{{ tor_distribution_release }} main'
+    state: present
+    update_cache: yes
+  when: tor_alpha
+
+# Background:
+# https://github.com/nusenu/ansible-relayor/issues/72
+- name: Ensure systemd generator folder exists (Debian/Ubuntu)
+  become: yes
+  file:
+    path: /etc/systemd/system-generators
+    state: directory
+    mode: 0755
+
+- name: Ensure custom systemd generator is in place (Debian/Ubuntu only)
+  become: yes
+  copy:
+    src: tor-generator
+    dest: /etc/systemd/system-generators/tor-generator
+    owner: root
+    mode: 0755
+
+#- name: Ensure AppArmor allows access to necessary files (Ubuntu)
+#  become: yes
+#  lineinfile: dest=/etc/apparmor.d/local/system_tor line={{ item }}
+#  with_items:
+#    - '/etc/tor/enabled/*\ r,'
+#    - '/{,var/}run/tor/*.pid\ w,'
+#    - '/var/lib/tor/**\ w,'
+#  when: ansible_distribution == 'Ubuntu'
+#  notify: restart apparmor
+
+#- meta: flush_handlers
