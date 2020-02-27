@@ -22,9 +22,9 @@
     - python-firewall
     - python3-devel
     - redhat-rpm-config
-    - python2
-    - python2-dnf
-    - libselinux-python
+    - python3
+    - python3-dnf
+    - policycoreutils-python-utils
     - firewalld
     - which
   when: ansible_distribution == "Fedora"

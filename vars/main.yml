@@ -4,6 +4,9 @@ packages:
   - cowsay
   - figlet
   - fortune-mod
+  - gcc
+  - gcc-c++
+  
 
 motd: |
     "

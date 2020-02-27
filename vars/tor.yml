@@ -1,0 +1,11 @@
+hidden_services:
+    - dir: /var/lib/tor/homeassistant/
+      port: 8123
+      source: 127.0.0.1:8123
+      version: 3
+    - dir: /var/lib/tor/ssh-onion_v3
+      port: 22
+      source: 127.0.0.1:22
+      version: 3
+tor_user: toranon
+tor_group: toranon

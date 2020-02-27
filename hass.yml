@@ -3,19 +3,27 @@
   pre_tasks: 
     - include_vars: vars/tor.yml
     - include_vars: vars/main.yml
+      tags: 
+        - packages
     - include_vars: vars/hass.yml
   roles:
-    - homeassistant
-    - toke.tor
+    - role: homeassistant
+      become: yes
+    - role: toke.tor
+      become: yes
   tasks: 
     - name: Install required packages
+      become: yes
       package:
         name: '{{ item }}'
         state: latest
       loop: 
         - '{{ packages }}'
+      tags: 
+        - packages
 
     - name: Update motd
+      become: yes
       template: 
         src: 'motd.j2'
         dest: /etc/motd
