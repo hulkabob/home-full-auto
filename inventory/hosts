@@ -1,0 +1,5 @@
+[homekeeper]
+192.168.2.11 ansible_ssh_user=homekeeper
+
+[tombstone]
+tombstone.local ansible_ssh_user=undertaker

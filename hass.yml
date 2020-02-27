@@ -1,9 +1,9 @@
 --- 
-- hosts: homeassistant
+- hosts: homekeeper
   pre_tasks: 
-    - include: vars/tor.yml
-    - include: vars/main.yml
-    - include: vars/hass.yml
+    - include_vars: vars/tor.yml
+    - include_vars: vars/main.yml
+    - include_vars: vars/hass.yml
   roles:
     - homeassistant
     - toke.tor
